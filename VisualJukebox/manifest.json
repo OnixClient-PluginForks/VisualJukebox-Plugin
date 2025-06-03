@@ -1,0 +1,10 @@
+{
+  "uuid": "e9aa3f2a-097a-49fc-850f-3a7a6af24fac",
+  "plugin_name": "Visual Jukebox",
+  "plugin_author": "xJqms",
+  "plugin_description": "Allows you to see the record spinning on the jukebox.",
+  "plugin_version": "1.0.0",
+  "game_version": "1.21.80",
+  "runtime_version": 1,
+  "target_assembly": "VisualJukebox.dll"
+}
