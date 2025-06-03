@@ -31,7 +31,7 @@
             <HintPath>$(LOCALAPPDATA)\Packages\Microsoft.MinecraftUWP_8wekyb3d8bbwe\RoamingState\OnixClient\Plugins\runtime\OnixRuntime.dll</HintPath>
         </Reference>
 
-        <Analyzer Condition="'$(ServerPluginBuild)' == 'TRUE'" Include="OnixRuntime.CodeGenerators.dll"/>
+        <Analyzer Condition="'$(ServerPluginBuild)' == 'TRUE'" Include="$(ServerPluginBuildRuntime)/OnixRuntime.CodeGenerators.dll"/>
         <Analyzer Condition="'$(ServerPluginBuild)' != 'TRUE'" Include="$(LOCALAPPDATA)\Packages\Microsoft.MinecraftUWP_8wekyb3d8bbwe\RoamingState\OnixClient\Plugins\runtime\OnixRuntime.CodeGenerators.dll"/>
     </ItemGroup>
 
