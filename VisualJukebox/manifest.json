@@ -3,7 +3,7 @@
   "plugin_name": "Visual Jukebox",
   "plugin_author": "xJqms",
   "plugin_description": "Allows you to see the record spinning on the jukebox.",
-  "plugin_version": "1.0.0",
+  "plugin_version": "1.0.1",
   "game_version": "1.21.80",
   "runtime_version": 2,
   "target_assembly": "VisualJukebox.dll"
