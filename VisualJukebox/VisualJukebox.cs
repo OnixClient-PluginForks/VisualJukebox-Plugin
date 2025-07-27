@@ -79,7 +79,6 @@ namespace VisualJukebox {
             
             foreach (BoundingBox box in _jukeboxPositions.Keys) {
                 float extrusionDepth = 0.06f * _discSize;
-                gfx.EnableLights(false);
                 gfx.SetupLights(box);
                 if (_jukeboxPositions.TryGetValue(box, out Dictionary<string, int?>? jukeboxData)) {
                     BoundingBox newBox = box;
@@ -93,10 +92,12 @@ namespace VisualJukebox {
                     float time = (float)Stopwatch.GetTimestamp() / Stopwatch.Frequency;
                     float bounce = (float)Math.Sin(time * bounceSpeed) * bounceHeight;
                     center.Y += bounce;
-                    using (var settings = gfx.PushWorldRenderSettings(true, true)) {
-
-                        Vec3 right = new Vec3((float)Math.Cos(_rotationAngle), 0, (float)Math.Sin(_rotationAngle)) * 0.5f * _discSize;
-                        Vec3 forward = new Vec3((float)-Math.Sin(_rotationAngle), 0, (float)Math.Cos(_rotationAngle)) * 0.5f * _discSize;
+                    {
+                        gfx.SetMaterialCustom("alpha_block_color", true);
+                        Vec3 right = new Vec3((float)Math.Cos(_rotationAngle), 0, (float)Math.Sin(_rotationAngle)) *
+                                     0.5f * _discSize;
+                        Vec3 forward = new Vec3((float)-Math.Sin(_rotationAngle), 0, (float)Math.Cos(_rotationAngle)) *
+                                       0.5f * _discSize;
 
                         string? jukeboxName = jukeboxData.Keys.ElementAtOrDefault(0);
 
@@ -111,7 +112,7 @@ namespace VisualJukebox {
                         else if (textureName == "record_relic")
                             textureName = "music_disc_relic";
                         using var mb = gfx.NewMeshBuilderSession(TexturePath.Game("textures/items/" + textureName),
-                            MeshBuilderPrimitiveType.Quad, ColorF.White);
+                            MeshBuilderPrimitiveType.Quad);
                         if (gfx.GetTextureStatus(TexturePath.Game("textures/items/" + textureName)) !=
                             RendererTextureStatus.Loaded) {
                             continue;
@@ -172,7 +173,7 @@ namespace VisualJukebox {
 
                         float pixelToWorldScale = (2f / Math.Max(width, height));
 
-                        float heightOffset = 0.03f;
+                        float heightOffset = 0.070f;
 
                         for (int y = 0; y < height; y++) {
                             for (int x = 0; x < width; x++) {
@@ -270,7 +271,7 @@ namespace VisualJukebox {
                         Vec3 trOffset = tr;
                         trOffset.Y += yOffset;
 
-                        Vec3 topOffset2 = new(0, heightOffset - 0.0001f, 0);
+                        Vec3 topOffset2 = new(0, heightOffset, 0);
                         Vec4 topNormal2 = new(0, 1, 0, 0);
                         mb.Builder.AddQuadUvNormalVertices(
                             tlOffset + topOffset2, new Vec2(0, 1),
@@ -284,13 +285,12 @@ namespace VisualJukebox {
                         gfx.FlushMesh();
                     }
 
-                    using (var settings = gfx.PushWorldRenderSettings(true, true, false, false)) {
+                    {
+                        gfx.SetMaterialCustom("reality_frame_cutout", true);
+                        boxCenter.Y += 0.74f;
+                        using var glassMb = gfx.NewMeshBuilderSession(TexturePath.Game("textures/blocks/glass"), MeshBuilderPrimitiveType.Quad);
 
-                        boxCenter.Y += 0.69f;
-                        using var glassMb = gfx.NewMeshBuilderSession(TexturePath.Game("textures/blocks/glass"));
-
-                        if (gfx.GetTextureStatus(TexturePath.Game("textures/blocks/glass")) !=
-                            RendererTextureStatus.Loaded) {
+                        if (gfx.GetTextureStatus(TexturePath.Game("textures/blocks/glass")) != RendererTextureStatus.Loaded) {
                             continue;
                         }
 
@@ -309,7 +309,7 @@ namespace VisualJukebox {
                         Vec3 topRight = boxCenter + glassRight + glassForward;
 
                         boxCenter.Y += 0.525f;
-                        float myYOffset = 0.0f;
+                        float myYOffset = 0f;
                         Vec3 bottomLeftOffset = bottomLeft;
                         bottomLeftOffset.Y += myYOffset;
                         Vec3 topLeftOffset = topLeft;
@@ -328,9 +328,9 @@ namespace VisualJukebox {
                         bottomRightBottom.Y -= glassHeight;
                         Vec3 topRightBottom = topRightOffset;
                         topRightBottom.Y -= glassHeight;
-                        
+
                         // Top face
-                        Vec3 topOffset3 = new(0, myYOffset - 0.0001f, 0);
+                        Vec3 topOffset3 = new(0, myYOffset, 0);
                         glassMb.Builder.Color(ColorF.White);
                         glassMb.Builder.AddQuadUvVertices(
                             topLeftOffset + topOffset3, new Vec2(0, 1),
@@ -380,6 +380,104 @@ namespace VisualJukebox {
                         );
                         glassMb.Builder.Color(ColorF.White);
                         glassMb.Dispose();
+                        gfx.FlushMesh();
+                    }
+                    {
+                        gfx.SetMaterialCustom("alpha_block_color", true);
+                        boxCenter.Y -= 0.71f;
+                        using var obsidianMb = gfx.NewMeshBuilderSession(TexturePath.Game("textures/blocks/obsidian"));
+
+                        if (gfx.GetTextureStatus(TexturePath.Game("textures/blocks/obsidian")) !=
+                            RendererTextureStatus.Loaded) {
+                            continue;
+                        }
+                        float _obsidianSize = 0.88f;
+                        Vec3 obsidianRight =
+                            new Vec3((float)Math.Cos(_rotationAngle * 0), 0, (float)Math.Sin(_rotationAngle * 0)) *
+                            0.5f *
+                            _obsidianSize;
+                        Vec3 obsidianForward =
+                            new Vec3((float)-Math.Sin(_rotationAngle * 0), 0, (float)Math.Cos(_rotationAngle * 0)) *
+                            0.5f *
+                            _obsidianSize;
+
+                        Vec3 bottomLeft = boxCenter - obsidianRight - obsidianForward;
+                        Vec3 topLeft = boxCenter - obsidianRight + obsidianForward;
+                        Vec3 bottomRight = boxCenter + obsidianRight - obsidianForward;
+                        Vec3 topRight = boxCenter + obsidianRight + obsidianForward;
+
+                        boxCenter.Y += 0.525f;
+                        float myYOffset = 0.0f;
+                        Vec3 bottomLeftOffset = bottomLeft;
+                        bottomLeftOffset.Y += myYOffset;
+                        Vec3 topLeftOffset = topLeft;
+                        topLeftOffset.Y += myYOffset;
+                        Vec3 bottomRightOffset = bottomRight;
+                        bottomRightOffset.Y += myYOffset;
+                        Vec3 topRightOffset = topRight;
+                        topRightOffset.Y += myYOffset;
+
+                        float obsidianHeight = _obsidianSize;
+                        Vec3 bottomLeftBottom = bottomLeftOffset;
+                        bottomLeftBottom.Y -= obsidianHeight;
+                        Vec3 topLeftBottom = topLeftOffset;
+                        topLeftBottom.Y -= obsidianHeight;
+                        Vec3 bottomRightBottom = bottomRightOffset;
+                        bottomRightBottom.Y -= obsidianHeight;
+                        Vec3 topRightBottom = topRightOffset;
+                        topRightBottom.Y -= obsidianHeight;
+
+                        // Top face
+                        Vec3 topOffset3 = new(0, myYOffset - 0.0001f, 0);
+                        obsidianMb.Builder.Color(ColorF.White);
+                        obsidianMb.Builder.AddQuadUvVertices(
+                            topLeftOffset + topOffset3, new Vec2(0, 1),
+                            topRightOffset + topOffset3, new Vec2(1, 1),
+                            bottomLeftOffset + topOffset3, new Vec2(0, 0),
+                            bottomRightOffset + topOffset3, new Vec2(1, 0)
+                        );
+                        obsidianMb.Builder.Color(ColorF.White);
+
+                        // Front face
+                        obsidianMb.Builder.Color(new ColorF(175, 175, 175));
+                        obsidianMb.Builder.AddQuadUvVertices(
+                            topLeftOffset, new Vec2(0, 0),
+                            topLeftBottom, new Vec2(0, 1),
+                            topRightOffset, new Vec2(1, 0),
+                            topRightBottom, new Vec2(1, 1)
+                        );
+                        obsidianMb.Builder.Color(ColorF.White);
+
+                        // Back face
+                        obsidianMb.Builder.Color(new ColorF(175, 175, 175));
+                        obsidianMb.Builder.AddQuadUvVertices(
+                            bottomRightOffset, new Vec2(0, 0),
+                            bottomRightBottom, new Vec2(0, 1),
+                            bottomLeftOffset, new Vec2(1, 0),
+                            bottomLeftBottom, new Vec2(1, 1)
+                        );
+                        obsidianMb.Builder.Color(ColorF.White);
+
+                        // Left face
+                        obsidianMb.Builder.Color(new ColorF(200, 200, 200));
+                        obsidianMb.Builder.AddQuadUvVertices(
+                            bottomLeftOffset, new Vec2(0, 0),
+                            bottomLeftBottom, new Vec2(0, 1),
+                            topLeftOffset, new Vec2(1, 0),
+                            topLeftBottom, new Vec2(1, 1)
+                        );
+                        obsidianMb.Builder.Color(ColorF.White);
+
+                        // Right face
+                        obsidianMb.Builder.Color(new ColorF(200, 200, 200));
+                        obsidianMb.Builder.AddQuadUvVertices(
+                            topRightOffset, new Vec2(0, 0),
+                            topRightBottom, new Vec2(0, 1),
+                            bottomRightOffset, new Vec2(1, 0),
+                            bottomRightBottom, new Vec2(1, 1)
+                        );
+                        obsidianMb.Builder.Color(ColorF.White);
+                        obsidianMb.Dispose();
                         gfx.FlushMesh();
                     }
                 }
